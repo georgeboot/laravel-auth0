@@ -15,41 +15,37 @@ final class ServiceProvider extends \Spatie\LaravelPackageTools\PackageServicePr
     }
 
     /**
-    * Register application services.
-    *
-    * @return void
-    */
+     * Register application services.
+     */
     public function registeringPackage(): void
     {
-        app()->singleton(Auth0::class, static function () {
-            return new Auth0(fn() => app());
+        app()->singleton(Auth0::class, static function (): \Auth0\Laravel\Auth0 {
+            return new Auth0();
         });
 
-        app()->singleton('auth0', function () {
+        app()->singleton('auth0', static function (): \Auth0\Laravel\Auth0 {
             return app()->make(Auth0::class);
         });
 
-        app()->singleton(StateInstance::class, static function () {
+        app()->singleton(StateInstance::class, static function (): \Auth0\Laravel\StateInstance {
             return new StateInstance();
         });
 
-        app()->singleton(\Auth0\Laravel\Auth\User\Repository::class, static function () {
-            return new \Auth0\Laravel\Auth\User\Repository(fn() => app());
+        app()->singleton(\Auth0\Laravel\Auth\User\Repository::class, static function (): \Auth0\Laravel\Auth\User\Repository {
+            return new \Auth0\Laravel\Auth\User\Repository();
         });
     }
 
     /**
-    * Register middleware and guard.
-    *
-    * @return void
-    */
+     * Register middleware and guard.
+     */
     public function bootingPackage(): void
     {
-        auth()->provider('auth0', function ($app, array $config) {
-            return new \Auth0\Laravel\Auth\User\Provider(app()->make($config['repository']), app('auth0'));
+        auth()->provider('auth0', static function ($app, array $config): \Auth0\Laravel\Auth\User\Provider {
+            return new \Auth0\Laravel\Auth\User\Provider(app()->make($config['repository']));
         });
 
-        auth()->extend('auth0', function ($app, $name, array $config) {
+        auth()->extend('auth0', static function ($app, $name, array $config): \Auth0\Laravel\Auth\Guard {
             return new \Auth0\Laravel\Auth\Guard(auth()->createUserProvider($config['provider']), $app->make('request'));
         });
     }

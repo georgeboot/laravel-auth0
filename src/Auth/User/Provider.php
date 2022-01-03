@@ -6,22 +6,19 @@ namespace Auth0\Laravel\Auth\User;
 
 final class Provider implements \Illuminate\Contracts\Auth\UserProvider
 {
-    protected Repository $repository;
+    private Repository $repository;
 
-    protected \Auth0\Laravel\Auth0 $service;
+    private \Auth0\Laravel\Auth0 $service;
 
     /**
      * Auth0UserProvider constructor.
      *
      * @param \Auth0\Laravel\Auth\User\Repository $repository
-     * @param \Auth0\Laravel\Auth0                $auth0
      */
     public function __construct(
-        Repository $repository,
-        \Auth0\Laravel\Auth0 $auth0
+        Repository $repository
     ) {
         $this->repository = $repository;
-        $this->auth0 = $auth0;
     }
 
     /**
@@ -47,6 +44,8 @@ final class Provider implements \Illuminate\Contracts\Auth\UserProvider
 
     /**
      * Returns a \Auth0\Laravel\Model\Stateless\User instance from an Access Token.
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter
      */
     public function retrieveByToken(
         $identifier,
@@ -85,6 +84,8 @@ final class Provider implements \Illuminate\Contracts\Auth\UserProvider
 
     /**
      * Returns true if the provided $user's unique identifier matches the credentials payload.
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter
      */
     public function validateCredentials(
         \Illuminate\Contracts\Auth\Authenticatable $user,
@@ -95,6 +96,8 @@ final class Provider implements \Illuminate\Contracts\Auth\UserProvider
 
     /**
      * Method required by interface. Not supported.
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter
      */
     public function updateRememberToken(
         \Illuminate\Contracts\Auth\Authenticatable $user,

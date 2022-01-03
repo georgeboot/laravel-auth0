@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auth0\Laravel\Model;
 
 abstract class User implements \Illuminate\Contracts\Auth\Authenticatable
@@ -41,7 +43,7 @@ abstract class User implements \Illuminate\Contracts\Auth\Authenticatable
     public function __get(
         string $name
     ) {
-        return (array_key_exists($name, $this->profile) ? $this->profile[$name] : null);
+        return array_key_exists($name, $this->profile) ? $this->profile[$name] : null;
     }
 
     /**
@@ -98,6 +100,8 @@ abstract class User implements \Illuminate\Contracts\Auth\Authenticatable
      * Set the token value for the "remember me" session.
      *
      * @param string $value
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter
      */
     public function setRememberToken(
         $value

@@ -25,10 +25,10 @@ final class Authorize
         \Closure $next
     ) {
         if (auth()->guard('auth0')->check()) {
-            auth()->login(Auth::guard('auth0')->user());
+            auth()->login(auth()->guard('auth0')->user());
             return $next($request);
         }
 
-        abort(403, 'Unauthorized');
+        return abort(403, 'Unauthorized');
     }
 }

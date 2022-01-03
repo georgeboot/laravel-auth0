@@ -8,8 +8,7 @@ final class Logout
 {
     public function __invoke(
         \Illuminate\Http\Request $request
-    ): \Illuminate\Http\RedirectResponse
-    {
+    ): \Illuminate\Http\RedirectResponse {
         if (auth()->guard('auth0')->check()) {
             auth()->guard('auth0')->logout();
 

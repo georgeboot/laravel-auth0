@@ -11,35 +11,35 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
      *
      * @var \Illuminate\Contracts\Auth\UserProvider
      */
-    protected $provider;
+    private $provider;
 
     /**
      * The request instance.
      *
      * @var \Illuminate\Http\Request
      */
-    protected $request;
+    private $request;
 
     /**
      * The name of the query string item from the request containing the API token.
      *
      * @var string
      */
-    protected $inputKey;
+    private $inputKey;
 
     /**
      * The name of the token "column" in persistent storage.
      *
      * @var string
      */
-    protected $storageKey;
+    private $storageKey;
 
     /**
      * Indicates if the API token is hashed in storage.
      *
      * @var bool
      */
-    protected $hash = false;
+    private $hash = false;
 
     /**
      * Create a new authentication guard.
@@ -57,11 +57,11 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
         $storageKey = 'api_token',
         $hash = false
     ) {
-        $this->hash = $hash;
-        $this->request = $request;
         $this->provider = $provider;
+        $this->request = $request;
         $this->inputKey = $inputKey;
         $this->storageKey = $storageKey;
+        $this->hash = $hash;
     }
 
     /**
@@ -77,11 +77,10 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
     }
 
     /**
-     * Set the current user.
-     *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * Clear the current user.
      */
-    public function logout(): self {
+    public function logout(): self
+    {
         $this->getInstance()->setUser(null);
         app('auth0')->getSdk()->clear();
         return $this;
@@ -110,15 +109,11 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
     /**
      * Get the ID for the currently authenticated user.
      *
-     * @return mixed
+     * @return int|string|null
      */
     public function id()
     {
-        $user = $this->user();
-
-        if ($user !== null) {
-            return $user->getAuthIdentifier();
-        }
+        return $this->user() !== null ? $this->user()->getAuthIdentifier() : null;
     }
 
     /**
@@ -129,17 +124,13 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
     public function validate(
         array $credentials = []
     ): bool {
-        if (empty($credentials[$this->inputKey])) {
+        if (! isset($credentials[$this->inputKey])) {
             return false;
         }
 
         $credentials = [$this->storageKey => $credentials[$this->inputKey]];
 
-        if ($this->provider->retrieveByCredentials($credentials)) {
-            return true;
-        }
-
-        return false;
+        return $this->provider->retrieveByCredentials($credentials) !== null;
     }
 
     /**

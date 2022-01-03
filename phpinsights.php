@@ -46,10 +46,7 @@ return [
         ],
         \SlevomatCodingStandard\Sniffs\Functions\UnusedParameterSniff::class => [
             'exclude' => [
-                'src/Auth0/Login/Auth0JWTUser.php',
-                'src/Auth0/Login/Auth0User.php',
-                'src/Auth0/Login/Auth0UserProvider.php',
-                'src/Auth0/Login/LoginServiceProvider.php',
+                'src/ServiceProvider.php',
             ],
         ],
         \SlevomatCodingStandard\Sniffs\Classes\ModernClassNameReferenceSniff::class => [

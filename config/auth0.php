@@ -36,5 +36,5 @@ return [
     // Named routes the SDK may call during stateful requests for redirections.
     'routeLogin' => 'login',
     'routeLogout' => 'logout',
-    'routeCallback' => 'callback'
+    'routeCallback' => 'callback',
 ];

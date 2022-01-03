@@ -6,7 +6,7 @@ namespace Auth0\Laravel;
 
 final class StateInstance
 {
-    protected ?\Illuminate\Contracts\Auth\Authenticatable $user = null;
+    private ?\Illuminate\Contracts\Auth\Authenticatable $user = null;
 
     public function setUser(
         ?\Illuminate\Contracts\Auth\Authenticatable $user
