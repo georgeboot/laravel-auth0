@@ -10,23 +10,15 @@ final class Logout
         \Illuminate\Http\Request $request
     ): \Illuminate\Http\RedirectResponse
     {
-        var_dump("LOGOUT() HIT");
-        exit;
+        if (auth()->guard('auth0')->check()) {
+            auth()->guard('auth0')->logout();
 
-        // if (auth()->guard('auth0')->check()) {
-        //     auth()->login(Auth::guard('auth0')->user());
-        // }
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        // $service = app('auth0');
-        // $profile = $service->getUser();
+            return redirect()->away(app('auth0')->getSdk()->authentication()->getLogoutLink());
+        }
 
-        // $user = $profile ? $userRepository->getUserByUserInfo($profile) : null;
-
-        // if ($user !== null) {
-        //     event(new \Auth0\Laravel\Event\LoggedIn($user));
-        //     \auth()->login($user, $service->rememberUser());
-        // }
-
-        // return \redirect()->intended('/');
+        return redirect()->intended('/');
     }
 }

@@ -30,8 +30,19 @@ final class Provider implements \Illuminate\Contracts\Auth\UserProvider
     public function retrieveById(
         $identifier
     ): ?\Illuminate\Contracts\Auth\Authenticatable {
+        $decoded = app('auth0')->getSdk()->decode($identifier, null, null, null, null, null, null, \Auth0\SDK\Token::TYPE_ID_TOKEN)->toArray();
+        $scope = $decoded['scope'] ?? '';
+
         // Process $identifier here ...
-        return $this->repository->fromAccessToken($identifier);
+        return $this->repository->fromAccessToken(
+            $decoded,
+            null,
+            $identifier,
+            explode(' ', $scope),
+            null,
+            null,
+            null,
+        );
     }
 
     /**
@@ -41,15 +52,17 @@ final class Provider implements \Illuminate\Contracts\Auth\UserProvider
         $identifier,
         $token
     ): ?\Illuminate\Contracts\Auth\Authenticatable {
-        // Process $identifier here ...
+        $decoded = app('auth0')->getSdk()->decode($token, null, null, null, null, null, null, \Auth0\SDK\Token::TYPE_TOKEN)->toArray();
+        $scope = $decoded['scope'] ?? '';
+
         return $this->repository->fromAccessToken(
-            $credentials['user'] ?? null,
-            $credentials['idToken'] ?? null,
-            $credentials['accessToken'] ?? null,
-            $credentials['accessTokenScope'] ?? null,
-            $credentials['accessTokenExpiration'] ?? null,
-            $credentials['accessTokenExpired'] ?? null,
-            $credentials['refreshToken'] ?? null,
+            $decoded,
+            null,
+            $token,
+            explode(' ', $scope),
+            null,
+            null,
+            null,
         );
     }
 

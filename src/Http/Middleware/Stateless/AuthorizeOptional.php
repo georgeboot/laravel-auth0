@@ -24,7 +24,7 @@ final class AuthorizeOptional
         \Closure $next
     ) {
         if (auth()->guard('auth0')->check()) {
-            auth()->login(Auth::guard('auth0')->user());
+            auth()->guard('auth0')->login(auth()->guard('auth0')->user());
         }
 
         return $next($request);

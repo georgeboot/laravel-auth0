@@ -4,7 +4,7 @@ namespace Auth0\Laravel\Model;
 
 abstract class User implements \Illuminate\Contracts\Auth\Authenticatable
 {
-    private array $useprofiler;
+    private array $profile;
     private ?string $idToken;
     private ?string $accessToken;
     private ?array $accessTokenScope;
@@ -41,11 +41,7 @@ abstract class User implements \Illuminate\Contracts\Auth\Authenticatable
     public function __get(
         string $name
     ) {
-        if (! array_key_exists($name, $this->profile)) {
-            return null;
-        }
-
-        return $this->profile[$name];
+        return (array_key_exists($name, $this->profile) ? $this->profile[$name] : null);
     }
 
     /**
@@ -114,5 +110,40 @@ abstract class User implements \Illuminate\Contracts\Auth\Authenticatable
     public function getRememberTokenName(): string
     {
         return '';
+    }
+
+    public function getProfile(): ?array
+    {
+        return $this->profile;
+    }
+
+    public function getIdToken(): ?string
+    {
+        return $this->idToken;
+    }
+
+    public function getAccessToken(): ?string
+    {
+        return $this->accessToken;
+    }
+
+    public function getAccessTokenScope(): ?array
+    {
+        return $this->accessTokenScope;
+    }
+
+    public function getAccessTokenExpiration(): ?int
+    {
+        return $this->accessTokenExpiration;
+    }
+
+    public function getAccessTokenExpired(): ?bool
+    {
+        return $this->accessTokenExpired;
+    }
+
+    public function getRefreshToken(): ?string
+    {
+        return $this->refreshToken;
     }
 }

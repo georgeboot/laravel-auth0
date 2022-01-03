@@ -30,7 +30,7 @@ final class ServiceProvider extends \Spatie\LaravelPackageTools\PackageServicePr
         });
 
         app()->singleton(StateInstance::class, static function () {
-            return new StateInstance(fn() => app());
+            return new StateInstance();
         });
 
         app()->singleton(\Auth0\Laravel\Auth\User\Repository::class, static function () {

@@ -7,13 +7,6 @@ namespace Auth0\Laravel\Auth;
 final class Guard implements \Illuminate\Contracts\Auth\Guard
 {
     /**
-     * The currently authenticated user.
-     *
-     * @var \Illuminate\Contracts\Auth\Authenticatable
-     */
-    protected $user;
-
-    /**
      * The user provider implementation.
      *
      * @var \Illuminate\Contracts\Auth\UserProvider
@@ -79,7 +72,18 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
     public function login(
         \Illuminate\Contracts\Auth\Authenticatable $user
     ): self {
-        $this->setUser($user);
+        $this->getInstance()->setUser($user);
+        return $this;
+    }
+
+    /**
+     * Set the current user.
+     *
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     */
+    public function logout(): self {
+        $this->getInstance()->setUser(null);
+        app('auth0')->getSdk()->clear();
         return $this;
     }
 
@@ -110,8 +114,10 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
      */
     public function id()
     {
-        if ($this->user()) {
-            return $this->user()->getAuthIdentifier();
+        $user = $this->user();
+
+        if ($user !== null) {
+            return $user->getAuthIdentifier();
         }
     }
 
@@ -141,7 +147,7 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
      */
     public function hasUser(): bool
     {
-        return ! is_null($this->user);
+        return ! is_null($this->getInstance()->getUser());
     }
 
     /**
@@ -152,7 +158,7 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
     public function setUser(
         \Illuminate\Contracts\Auth\Authenticatable $user
     ): self {
-        $this->user = $user;
+        $user = $this->getInstance()->setUser($user);
         return $this;
     }
 
@@ -173,29 +179,30 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
      */
     public function user(): ?\Illuminate\Contracts\Auth\Authenticatable
     {
-        if ($this->user !== null) {
-            return $this->user;
+        $instance = $this->getInstance();
+        $user = $instance->getUser();
+
+        if ($user === null) {
+            $stateful = app('auth0')->getSdk()->getCredentials();
+
+            if ($stateful !== null) {
+                $user = $this->provider->retrieveByCredentials((array) $stateful);
+            }
         }
 
-        $statefulSession = app('auth0')->getSdk()->getCredentials();
+        if ($user === null) {
+            $token = $this->getTokenForRequest();
 
-        if ($statefulSession !== null) {
-            return $this->provider->retrieveByCredentials((array) $statefulSession);
+            if ($token !== null) {
+                $user = $this->provider->retrieveByToken([], $token);
+            }
         }
 
-        exit;
-
-        $user = null;
-
-        $token = $this->getTokenForRequest();
-
-        if (! empty($token)) {
-            $user = $this->provider->retrieveByCredentials([
-                $this->storageKey => $this->hash ? hash('sha256', $token) : $token,
-            ]);
+        if ($user !== null) {
+            $instance->setUser($user);
         }
 
-        return $this->user = $user;
+        return $user;
     }
 
     /**
@@ -218,5 +225,10 @@ final class Guard implements \Illuminate\Contracts\Auth\Guard
         }
 
         return $token;
+    }
+
+    private function getInstance(): \Auth0\Laravel\StateInstance
+    {
+        return app()->make(\Auth0\Laravel\StateInstance::class);
     }
 }

@@ -6,9 +6,17 @@ namespace Auth0\Laravel;
 
 final class StateInstance
 {
-    public function __construct(
-        \Closure $app
-    ) {
-        var_dump("Hello world.");
+    protected ?\Illuminate\Contracts\Auth\Authenticatable $user = null;
+
+    public function setUser(
+        ?\Illuminate\Contracts\Auth\Authenticatable $user
+    ): self {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getUser(): ?\Illuminate\Contracts\Auth\Authenticatable
+    {
+        return $this->user;
     }
 }
